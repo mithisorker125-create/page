@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nimbus — Workflow automation for small teams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FAFAF8;
+    --surface: #F0F1F5;
+    --surface-2: #E7E9F0;
+    --ink: #14171F;
+    --ink-soft: #5B6169;
+    --line: #E2E4EA;
+    --accent: #3D5AFE;
+    --accent-ink: #FFFFFF;
+    --mint: #00C896;
+    --radius: 14px;
+    --max: 1180px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Space Grotesk', sans-serif;
+    letter-spacing:-0.02em;
+    line-height:1.08;
+    font-weight:600;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 32px;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  :focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(250,250,248,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 0;
+  }
+  .logo{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:20px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo-mark{
+    width:22px; height:22px; border-radius:6px;
+    background:linear-gradient(135deg, var(--accent), var(--mint));
+    flex-shrink:0;
+  }
+  .nav-links{
+    display:flex; gap:36px; font-size:14.5px; color:var(--ink-soft);
+  }
+  .nav-links a{transition:color .15s ease;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{
+    display:flex; align-items:center; gap:20px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:11px 22px;
+    border-radius:999px;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn-primary{
+    background:var(--ink);
+    color:#fff;
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(20,23,31,.18);}
+  .btn-ghost{
+    color:var(--ink); border-color:var(--line); background:transparent;
+    display:none;
+  }
+  @media (min-width:900px){ .btn-ghost{display:inline-flex;} }
+  .nav-toggle{display:none;}
+
+  @media (max-width:900px){
+    .nav-links{display:none;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:88px 0 64px;
+    display:grid; grid-template-columns:1.05fr 1fr; gap:56px; align-items:center;
+  }
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr; padding:56px 0 40px;}
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600; color:var(--accent);
+    background:rgba(61,90,254,0.08);
+    border:1px solid rgba(61,90,254,0.18);
+    padding:6px 14px; border-radius:999px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:''; width:6px; height:6px; border-radius:50%; background:var(--mint);
+  }
+  .hero h1{
+    font-size:clamp(34px, 4.6vw, 56px);
+    max-width:15ch;
+    margin-bottom:22px;
+  }
+  .hero h1 .accent-word{
+    background:linear-gradient(90deg, var(--accent), #6B7CFF);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p{
+    font-size:17.5px; color:var(--ink-soft); max-width:46ch; margin-bottom:34px;
+  }
+  .hero-cta{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:38px;}
+  .btn-lg{padding:14px 26px; font-size:15.5px;}
+  .btn-outline{
+    border:1px solid var(--line); color:var(--ink); background:#fff;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-outline:hover{border-color:var(--ink);}
+
+  .hero-meta{
+    display:flex; gap:28px; color:var(--ink-soft); font-size:13.5px; flex-wrap:wrap;
+  }
+  .hero-meta span{display:flex; align-items:center; gap:7px;}
+  .hero-meta svg{flex-shrink:0;}
+
+  /* ---------- Signature: animated flow diagram ---------- */
+  .flow-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:26px;
+    box-shadow:0 20px 60px -20px rgba(20,23,31,0.15);
+  }
+  .flow-card-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .flow-card-head .dots{display:flex; gap:6px;}
+  .flow-card-head .dots span{width:9px; height:9px; border-radius:50%; background:var(--line);}
+  .flow-card-head .label{font-size:12.5px; color:var(--ink-soft);}
+  .flow-title{font-size:13px; font-weight:600; color:var(--ink-soft); margin-bottom:16px;}
+
+  .flow-svg{width:100%; height:auto; display:block;}
+  .flow-node-box{
+    fill:#fff; stroke:var(--line); stroke-width:1.4;
+  }
+  .flow-node-box.active{stroke:var(--accent);}
+  .flow-node-label{
+    font-family:'Inter', sans-serif; font-size:12.5px; fill:var(--ink); font-weight:600;
+  }
+  .flow-node-sub{
+    font-family:'JetBrains Mono', monospace; font-size:9.5px; fill:var(--ink-soft);
+  }
+  .flow-path{
+    fill:none; stroke:var(--line); stroke-width:1.6;
+  }
+  .flow-dot{
+    fill:var(--accent);
+  }
+  .pulse-path{
+    stroke-dasharray:6 6;
+    animation:dash 1.6s linear infinite;
+  }
+  @keyframes dash{ to{ stroke-dashoffset:-24; } }
+
+  .flow-pulse{
+    animation:travel 3.2s ease-in-out infinite;
+  }
+  @keyframes travel{
+    0%{ offset-distance:0%; opacity:0; }
+    6%{ opacity:1; }
+    92%{ opacity:1; }
+    100%{ offset-distance:100%; opacity:0; }
+  }
+
+  /* ---------- Logo strip ---------- */
+  .logo-strip{
+    padding:36px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .logo-strip .wrap{
+    display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  }
+  .logo-strip .label{font-size:12.5px; color:var(--ink-soft); white-space:nowrap;}
+  .logo-row{display:flex; gap:40px; flex-wrap:wrap; align-items:center;}
+  .logo-row span{
+    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:16px; color:var(--ink-soft); opacity:.7;
+  }
+
+  /* ---------- Section shared ---------- */
+  section{padding:96px 0;}
+  .section-head{max-width:640px; margin-bottom:56px;}
+  .section-head .eyebrow{margin-bottom:16px;}
+  .section-head h2{font-size:clamp(28px,3.2vw,38px); margin-bottom:14px;}
+  .section-head p{color:var(--ink-soft); font-size:16px;}
+
+  /* ---------- Features ---------- */
+  .feature-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:24px;
+  }
+  @media (max-width:900px){ .feature-grid{grid-template-columns:1fr;} }
+  .feature-card{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:30px; transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .feature-card:hover{transform:translateY(-3px); box-shadow:0 16px 40px -18px rgba(20,23,31,0.18);}
+  .feature-icon{
+    width:42px; height:42px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--surface); margin-bottom:20px;
+  }
+  .feature-card h3{font-size:18px; margin-bottom:10px;}
+  .feature-card p{color:var(--ink-soft); font-size:14.5px;}
+
+  /* ---------- How it works ---------- */
+  .steps{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+    border-top:1px solid var(--line);
+  }
+  @media (max-width:900px){ .steps{grid-template-columns:1fr;} }
+  .step{
+    padding:32px 28px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .step:last-child{border-right:none;}
+  @media (max-width:900px){ .step{border-right:none;} }
+  .step-num{
+    font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--accent); margin-bottom:14px; display:block;
+  }
+  .step h3{font-size:17px; margin-bottom:8px;}
+  .step p{color:var(--ink-soft); font-size:14px;}
+
+  /* ---------- Testimonial ---------- */
+  .testimonial{
+    background:var(--ink); color:#fff; border-radius:24px; padding:64px 56px;
+    display:grid; grid-template-columns:auto 1fr; gap:40px; align-items:center;
+  }
+  @media (max-width:820px){ .testimonial{grid-template-columns:1fr; padding:44px 28px;} }
+  .testimonial .quote-mark{
+    font-family:'Space Grotesk',sans-serif; font-size:64px; color:var(--mint); line-height:1;
+  }
+  .testimonial blockquote{
+    font-family:'Space Grotesk', sans-serif; font-size:clamp(20px,2.4vw,28px); font-weight:500;
+    line-height:1.35; margin-bottom:24px;
+  }
+  .testimonial-author{display:flex; align-items:center; gap:12px; font-size:14px; color:#B8BCC8;}
+  .avatar{
+    width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--mint));
+  }
+
+  /* ---------- Pricing ---------- */
+  .pricing-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  }
+  @media (max-width:900px){ .pricing-grid{grid-template-columns:1fr;} }
+  .price-card{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:34px 30px; display:flex; flex-direction:column;
+  }
+  .price-card.featured{
+    border-color:var(--accent); box-shadow:0 20px 50px -20px rgba(61,90,254,0.35); position:relative;
+  }
+  .price-tag{
+    position:absolute; top:-13px; left:30px;
+    background:var(--accent); color:#fff; font-size:11.5px; font-weight:600;
+    padding:4px 12px; border-radius:999px;
+  }
+  .price-name{font-size:15px; color:var(--ink-soft); margin-bottom:12px; font-weight:600;}
+  .price-amount{font-family:'Space Grotesk',sans-serif; font-size:38px; font-weight:600; margin-bottom:4px;}
+  .price-amount span{font-size:15px; color:var(--ink-soft); font-weight:500;}
+  .price-desc{color:var(--ink-soft); font-size:13.5px; margin-bottom:24px;}
+  .price-list{list-style:none; margin-bottom:28px; flex:1;}
+  .price-list li{
+    display:flex; align-items:flex-start; gap:10px; font-size:14px; padding:8px 0;
+    border-top:1px solid var(--line);
+  }
+  .price-list li:first-child{border-top:none;}
+  .price-list svg{flex-shrink:0; margin-top:2px;}
+  .price-card .btn{width:100%;}
+
+  /* ---------- CTA footer band ---------- */
+  .cta-band{
+    background:linear-gradient(135deg, #EEF0FF, #FAFAF8);
+    border:1px solid var(--line); border-radius:24px;
+    padding:64px 48px; text-align:center;
+  }
+  .cta-band h2{font-size:clamp(26px,3.4vw,36px); margin-bottom:14px;}
+  .cta-band p{color:var(--ink-soft); margin-bottom:30px;}
+  .cta-band .hero-cta{justify-content:center;}
+
+  footer{
+    border-top:1px solid var(--line); padding:48px 0 32px;
+  }
+  .foot-top{
+    display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; margin-bottom:36px;
+  }
+  .foot-cols{display:flex; gap:64px; flex-wrap:wrap;}
+  .foot-col h4{font-size:13px; color:var(--ink-soft); margin-bottom:14px; font-weight:600;}
+  .foot-col a{display:block; font-size:14px; color:var(--ink); margin-bottom:10px; opacity:.85;}
+  .foot-col a:hover{opacity:1; color:var(--accent);}
+  .foot-bottom{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    padding-top:24px; border-top:1px solid var(--line);
+    font-size:13px; color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo"><span class="logo-mark"></span>Nimbus</div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">Reviews</a>
+      </div>
+      <div class="nav-cta">
+        <a href="#" class="btn btn-ghost">Sign in</a>
+        <a href="#" class="btn btn-primary">Start free trial</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero wrap" style="padding-bottom:0;">
+    <div>
+      <div class="eyebrow">Workflow automation</div>
+      <h1>Software that handles the busywork, so your team can handle the <span class="accent-word">business</span>.</h1>
+      <p>Nimbus connects the tools you already use and runs the repetitive steps between them automatically — no code, no waiting on IT.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-primary btn-lg">Start free trial</a>
+        <a href="#" class="btn btn-outline btn-lg">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#14171F" stroke-width="1.3"/><path d="M6.5 5.5L10.5 8L6.5 10.5V5.5Z" fill="#14171F"/></svg>
+          Watch 90-sec demo
+        </a>
+      </div>
+      <div class="hero-meta">
+        <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>No credit card required</span>
+        <span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Set up in under 10 minutes</span>
+      </div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-card-head">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <div class="label mono">order-fulfillment.flow</div>
+      </div>
+      <div class="flow-title">RUNNING NOW</div>
+      <svg class="flow-svg" viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- paths -->
+        <path id="p1" class="flow-path pulse-path" d="M 90 55 L 90 130"/>
+        <path id="p2" class="flow-path pulse-path" d="M 90 190 L 90 245 L 220 245 L 220 190"/>
+        <path id="p3" class="flow-path pulse-path" d="M 220 130 L 220 70 L 350 70 L 350 130"/>
+
+        <!-- traveling dots -->
+        <circle class="flow-dot flow-pulse" r="4" style="offset-path: path('M 90 55 L 90 130'); animation-delay:0s;"/>
+        <circle class="flow-dot flow-pulse" r="4" style="offset-path: path('M 90 190 L 90 245 L 220 245 L 220 190'); animation-delay:0.9s;"/>
+        <circle class="flow-dot flow-pulse" r="4" style="offset-path: path('M 220 130 L 220 70 L 350 70 L 350 130'); animation-delay:1.8s;"/>
+
+        <!-- node 1 -->
+        <rect class="flow-node-box active" x="20" y="10" width="140" height="45" rx="10"/>
+        <text class="flow-node-label" x="36" y="30">New order received</text>
+        <text class="flow-node-sub" x="36" y="44">trigger · shopify</text>
+
+        <!-- node 2 -->
+        <rect class="flow-node-box" x="20" y="130" width="140" height="60" rx="10"/>
+        <text class="flow-node-label" x="36" y="155">Check inventory</text>
+        <text class="flow-node-sub" x="36" y="170">condition · in stock?</text>
+
+        <!-- node 3 -->
+        <rect class="flow-node-box" x="150" y="190" width="140" height="55" rx="10"/>
+        <text class="flow-node-label" x="166" y="213">Notify warehouse</text>
+        <text class="flow-node-sub" x="166" y="227">action · slack</text>
+
+        <!-- node 4 -->
+        <rect class="flow-node-box" x="280" y="130" width="140" height="60" rx="10"/>
+        <text class="flow-node-label" x="296" y="153">Update dashboard</text>
+        <text class="flow-node-sub" x="296" y="167">action · sheets</text>
+
+        <!-- node 5 -->
+        <rect class="flow-node-box" x="280" y="45" width="140" height="45" rx="10"/>
+        <text class="flow-node-label" x="296" y="65">Done — 0.8s</text>
+        <text class="flow-node-sub" x="296" y="79">4 steps completed</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- LOGO STRIP -->
+  <div class="logo-strip">
+    <div class="wrap">
+      <span class="label">TRUSTED BY OPERATIONS TEAMS AT</span>
+      <div class="logo-row">
+        <span>Fieldnote</span>
+        <span>Portside</span>
+        <span>Kettlewell</span>
+        <span>Greymark</span>
+        <span>Aldergate</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features" class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Features</div>
+      <h2>Everything between "it happened" and "it's handled."</h2>
+      <p>Three pieces that work together: triggers that watch for events, logic that decides what happens next, and actions that carry it out — all visible, all editable.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L3 11H9L8 18L17 8H11L12 2Z" stroke="#3D5AFE" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+        <h3>Automate repetitive work</h3>
+        <p>Turn the steps your team repeats every day into a flow that runs itself — approvals, hand-offs, status updates, reminders.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="6" cy="6" r="3" stroke="#3D5AFE" stroke-width="1.5"/><circle cx="14" cy="14" r="3" stroke="#3D5AFE" stroke-width="1.5"/><path d="M8.5 8.5L11.5 11.5" stroke="#3D5AFE" stroke-width="1.5"/></svg></div>
+        <h3>Connect your tools</h3>
+        <p>Nimbus plugs into the apps you already run your business on, so nothing changes for your team except the extra work.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.5" stroke="#3D5AFE" stroke-width="1.5"/><rect x="11" y="3" width="6" height="10" rx="1.5" stroke="#3D5AFE" stroke-width="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5" stroke="#3D5AFE" stroke-width="1.5"/></svg></div>
+        <h3>See everything in one place</h3>
+        <p>A live log of every run — what fired, what it decided, and what it changed — so nothing happens in the dark.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="wrap" style="padding-top:0;">
+    <div class="section-head">
+      <div class="eyebrow">How it works</div>
+      <h2>From idea to running automation in three steps.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <h3>Connect your tools</h3>
+        <p>Link the apps you use — inbox, spreadsheet, CRM, chat — with a one-time sign-in. No API keys to manage.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <h3>Build the flow</h3>
+        <p>Pick a trigger, add conditions, choose what happens next. Drag, drop, done — or start from a template.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <h3>Turn it on</h3>
+        <p>Nimbus runs the flow every time the trigger fires, and shows you a full history of every run.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="wrap">
+    <div class="testimonial">
+      <div class="quote-mark">"</div>
+      <div>
+        <blockquote>We deleted eleven recurring calendar reminders and a shared spreadsheet nobody trusted anymore. Nimbus just does the thing now.</blockquote>
+        <div class="testimonial-author">
+          <div class="avatar"></div>
+          <div>Reeta Chowdhury — Operations Lead, Fieldnote</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Pricing</div>
+      <h2>Plans that grow with your team.</h2>
+      <p>Every plan includes unlimited flows. You only pay for how much runs.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Starter</div>
+        <div class="price-amount">$0<span>/month</span></div>
+        <div class="price-desc">For trying Nimbus out on one workflow.</div>
+        <ul class="price-list">
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>1 active flow</li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>200 runs / month</li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Community support</li>
+        </ul>
+        <a href="#" class="btn btn-outline">Start free</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">Most popular</div>
+        <div class="price-name">Team</div>
+        <div class="price-amount">$39<span>/month</span></div>
+        <div class="price-desc">For teams automating across departments.</div>
+        <ul class="price-list">
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited flows</li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>20,000 runs / month</li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support</li>
+        </ul>
+        <a href="#" class="btn btn-primary">Start free trial</a>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Business</div>
+        <div class="price-amount">$99<span>/month</span></div>
+        <div class="price-desc">For companies with compliance needs.</div>
+        <ul class="price-list">
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited everything</li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>SSO & audit logs</li>
+          <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="#00C896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated support</li>
+        </ul>
+        <a href="#" class="btn btn-outline">Talk to sales</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="wrap">
+    <div class="cta-band">
+      <h2>Stop doing the work software should be doing.</h2>
+      <p>Set up your first flow in the next 10 minutes — free, no credit card.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-primary btn-lg">Start free trial</a>
+        <a href="#" class="btn btn-outline btn-lg">Book a demo</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="logo"><span class="logo-mark"></span>Nimbus</div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>PRODUCT</h4>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#how">How it works</a>
+        </div>
+        <div class="foot-col">
+          <h4>COMPANY</h4>
+          <a href="#">About</a>
+          <a href="#">Careers</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="foot-col">
+          <h4>LEGAL</h4>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Nimbus. All rights reserved.</span>
+      <span>Made for teams who'd rather build than babysit spreadsheets.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
